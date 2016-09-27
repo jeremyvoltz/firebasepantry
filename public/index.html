@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Pantry</title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+
+<link rel="stylesheet"  href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script  src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+  <!-- Vue -->
+  <script src="https://cdn.jsdelivr.net/vue/1.0.24/vue.js"></script>
+  <script src="https://cdn.jsdelivr.net/vue.router/0.7.10/vue-router.min.js"></script>
+
+<!-- <script src="https://www.gstatic.com/firebasejs/live/2.2.9/firebase.js"></script>
+ -->
+
+ <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-app.js"></script>
+<!-- <script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-auth.js"   ></script> -->
+<script src="https://www.gstatic.com/firebasejs/3.3.0/firebase-database.js"></script>
+
+  <script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyCABPLPl_7HFp-TeEjOWJdMg6jrpM64bu0",
+    // authDomain: "pantry-1722d.firebaseapp.com",
+    databaseURL: "https://pantry-1722d.firebaseio.com",
+    storageBucket: "pantry-1722d.appspot.com",
+  };
+  firebase.initializeApp(config);
+</script>
+
+  <script src="app.js"></script>
+
+
+<link rel="stylesheet" type="text/css" href="main.css">
+
+</head>
+
+<body>
+  
+<div class="container">
+
+<div id="app">
+
+<div id="propModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">{{focusFood.name}} </h4>
+      </div> 
+      <div class="modal-body">
+        <label :for="focusFood.name" >Essential</label> <input type="checkbox" id="focusFood.name" v-model="focusFood.essential" v-on:change="updateEssential(focusFood)">
+        <br>
+        <div class="row">
+          <div class="col-xs-3">
+            Stores:
+          </div>
+          <div v-for="store in stores" class="col-xs-3">
+            <input  type="checkbox" id="store" v-model="focusFood.stores[store.id]" v-on:change="updateStore(focusFood,store)">  <label  :for="store">{{store.name}}</label>
+          </div>
+        </div>
+      <div class="row">
+        <div class="col-xs-3">Notes:</div>
+        <div class="col-xs-3">
+                <textarea v-model="focusFood.notes">{{focusFood.notes}}</textarea>
+        </div>
+      </div>    
+      </div>
+      <!-- <div class="modal-footer"> -->
+        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+        <!-- <button type="button" class="btn btn-primary" v-on:click="updateProps(focusFood)">Save changes</button> -->
+      <!-- </div> -->
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<div id="storeModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Stores </h4>
+      </div> 
+      <div class="modal-body">
+        <table>
+          <tr>
+            <td>
+            <form id="form" v-on:submit.prevent="addStore">
+              <input v-model="newStore.name">
+              <input type="submit" value="Add">
+              </form>
+            </td>
+          </tr>
+          <tr v-for="store in stores">
+            <td>{{store.name}}</td>
+            <td><button v-on:click="removeStore(store)">X</button></td>
+          </tr>
+        </table>
+      </div>    
+      <!-- </div> -->
+      <!-- <div class="modal-footer"> -->
+        <!-- <button type="button" class="btn btn-default" data-dismiss="modal">Close</button> -->
+        <!-- <button type="button" class="btn btn-primary" v-on:click="updateProps(focusFood)">Save changes</button> -->
+      <!-- </div> -->
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+
+<form id="form" v-on:submit.prevent="addFood">
+    <input v-model="newFood.name">
+<!--     <input v-model="newUser.email"> -->
+    <input type="submit" value="Add">
+  </form>
+
+<table class="table">
+  <thead>
+    <tr>
+      <th>status</th>
+      <th>food</th>
+      <th>properties</th>
+      <th>remove</th>
+    </tr>
+  </thead>
+  <body>
+    <tr class="food" v-for="food in foods" transition>
+    <td> 
+    <select v-model="food.status" class="form-control" v-on:change="updateStatus(food)">
+  <!-- <template v-for="option in options"> -->
+    <option v-for="option in options" v-bind:value="option" v-bind:selected="option == food.status">{{option}}</option>
+  <!-- </template> -->
+      <!-- <option value="buy" v-bind:selected="food.status=='buy'">buy </option>
+      <option value="full" v-bind:selected="food.status=='full'">full</option>
+      <option value="sale" v-bind:selected="food.status=='sale'">if on sale</option> -->
+    </select>
+    </td>
+    <td> <h4>{{food.name}}</h4> </td>
+    <td> <span v-on:click="properties(food)" class="glyphicon glyphicon-wrench"></span v-on:click="properties(food)"> </td>
+    <td><button v-on:click="removeFood(food)">X</button></td>
+    </tr>
+  </body>
+</table>
+
+
+<a v-link="{ path: '/foo' }">Go to Foo</a>
+<a v-link="{ path: '/bar' }">Go to Bar</a>
+
+<router-view></router-view>
+
+</div>
+
+</div>
+
+  </body>
+</html>
+
+
+ 
