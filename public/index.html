@@ -150,7 +150,7 @@
     </select>
     </td>
     <td> <h4>{{food.name}}</h4> </td>
-    <!-- <td  class="shop" id="{{food.id}}_sale">(get if on sale)</td> -->
+    <!-- <td  class="shop" id="{{food.id}}_sale" v-show:"{{food.status}}=='sale'">(get if on sale)</td> -->
     <td class="pantry"> <span v-on:click="properties(food)" class="glyphicon glyphicon-wrench"></span v-on:click="properties(food)"> </td>
     <td class="pantry"><button v-on:click="removeFood(food)">X</button></td>
     </tr>

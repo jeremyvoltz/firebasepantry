@@ -164,6 +164,7 @@ var app = new Vue({
         $(".pantry").hide();
         $(".shop").show();
         $(".full").hide(); //food status
+        $(".sale").append("<td class='sale-bubble'>(if on sale)</td>")
 
     },
     purchase: function (food) {
@@ -195,6 +196,7 @@ var app = new Vue({
       $(".pantry").show();
         $(".shop").hide();
       $(".full").show(); //food status
+      $(".sale-bubble").remove();
     }
 
   }
