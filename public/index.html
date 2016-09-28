@@ -114,25 +114,32 @@
 </div><!-- /.modal -->
 
 
-
-<form id="form" v-on:submit.prevent="addFood">
-    <input v-model="newFood.name">
-<!--     <input v-model="newUser.email"> -->
-    <input type="submit" value="Add">
-  </form>
-
 <table class="table">
   <thead>
     <tr>
-      <th>status</th>
-      <th>food</th>
-      <th>properties</th>
-      <th>remove</th>
+      <th class="shop"></th>
+      <th class="pantry">status</th>
+      <th class="pantry" >food</th>
+      <th class="pantry">properties</th>
+      <th class="pantry">remove</th>
     </tr>
   </thead>
   <body>
-    <tr class="food" v-for="food in foods" transition>
-    <td> 
+    <tr>
+      <td></td>
+      <td>
+      <form id="form" class="pantry" v-on:submit.prevent="addFood">
+    <input v-model="newFood.name">
+    <input type="submit" value="Add">
+      </form>
+      </td>
+      <td></td>
+      <td></td>
+    </tr>
+
+    <tr id="{{food.id}}_row" v-for="food in foods" class="food {{food.status}}" transition>
+    <td class="shop"> <input type="checkbox" v-model="food.purchased" v-on:change="purchase(food)"> </td>
+    <td class="pantry"> 
     <select v-model="food.status" class="form-control" v-on:change="updateStatus(food)">
   <!-- <template v-for="option in options"> -->
     <option v-for="option in options" v-bind:value="option" v-bind:selected="option == food.status">{{option}}</option>
@@ -143,17 +150,22 @@
     </select>
     </td>
     <td> <h4>{{food.name}}</h4> </td>
-    <td> <span v-on:click="properties(food)" class="glyphicon glyphicon-wrench"></span v-on:click="properties(food)"> </td>
-    <td><button v-on:click="removeFood(food)">X</button></td>
+    <!-- <td  class="shop" id="{{food.id}}_sale">(get if on sale)</td> -->
+    <td class="pantry"> <span v-on:click="properties(food)" class="glyphicon glyphicon-wrench"></span v-on:click="properties(food)"> </td>
+    <td class="pantry"><button v-on:click="removeFood(food)">X</button></td>
     </tr>
   </body>
 </table>
 
 
-<a v-link="{ path: '/foo' }">Go to Foo</a>
-<a v-link="{ path: '/bar' }">Go to Bar</a>
 
-<router-view></router-view>
+
+   <button  class="button pantry" v-on:click="goShopping()">go shopping</button>
+
+ <button class="button pantry" v-on:click="storeModal()">stores</button>
+
+<button class="button shop" v-on:click="doneShopping()">Finished</button>
+
 
 </div>
 

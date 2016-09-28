@@ -13,9 +13,10 @@
 //  * Create Vue app
 //  */
 window.onload = function () {
+  $(".shop").hide();
+
 
 var baseURL = 'https://pantry-1722d.firebaseio.com/'
-Vue.use(VueRouter)
 
 /**
  * Setup firebase sync
@@ -57,17 +58,8 @@ Stores.on('child_removed', function (snapshot) {
   })
 });
 
-Vue.component('pantry', {
-  template:  '#pantry-template',
-  props: ['function']
-})
-Vue.component('essentials', {
-  template: '#essentials-template',
-  props: ['click']
-})
-Vue.component('shopping', {})
 
-var app = Vue.extend({
+var app = new Vue({
 
   // element to mount to
   el: '#app',
@@ -77,6 +69,7 @@ var app = Vue.extend({
     currentView: 'pantry',
     focusFood: null,
     foods: [],
+    shoppingList: [],
     options: ["buy", "full", "sale"],
     stores: [],
     // statuses: [{text: "buy", value: "buy"}, 
@@ -86,7 +79,8 @@ var app = Vue.extend({
       stores: {},
       essential: false,
       status: "buy",
-      notes: ""
+      notes: "",
+      purchased: false
       // buy: true
     },
     newStore: {
@@ -167,31 +161,45 @@ var app = Vue.extend({
           Foods.child(food.id+"/stores/"+store.id).set(true);
     },
     goShopping: function () {
-        app.currentView = 'essentials'
+        $(".pantry").hide();
+        $(".shop").show();
+        $(".full").hide(); //food status
+
+    },
+    purchase: function (food) {
+      Foods.child(food.id).update({"purchased":food.purchased});
+      if (food.purchased) {
+        $("#"+food.id+"_row").css("text-decoration","line-through")
+        $("#"+food.id+"_row").css("color","gray")
+      }
+      else {
+        $("#"+food.id+"_row").css("text-decoration","")
+        $("#"+food.id+"_row").css("color","")
+      }
+    },
+    doneShopping: function () {
+
+      for (var i = 0; i < app.foods.length; i++) {
+
+        var food = app.foods[i];
+        $("#"+food.id+"_row").css("text-decoration","")
+        $("#"+food.id+"_row").css("color","")
+
+        if (food.purchased) {
+          food.purchased = false;
+          Foods.child(food.id).update({"purchased":false});
+          food.status = "full";
+          Foods.child(food.id).update({"status": "full"});
+        }
+      }
+      $(".pantry").show();
+        $(".shop").hide();
+      $(".full").show(); //food status
     }
 
   }
 
   
 })
-var Foo = Vue.extend({
-    template: '<p>This is foo!</p>'
-})
-
-var Bar = {
-    template: '<p>This is bar!</p>'
-}
-
-var App = Vue.extend({})
-var router = new VueRouter()
-router.map({
-    '/foo': {
-        component: Foo
-    },
-    '/bar': {
-        component: Bar
-    }
-})
-router.start(App, '#app')
 
 }
