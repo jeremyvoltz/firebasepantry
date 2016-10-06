@@ -67,16 +67,17 @@ var app = new Vue({
   // initial data
   data: {
     currentView: 'pantry',
-    focusFood: null,
     foods: [],
     shoppingList: [],
     options: ["buy", "full", "sale"],
     stores: [],
+    focusStoreId: 0,
+    focusStoreName: "--",
     // statuses: [{text: "buy", value: "buy"}, 
     // {text:"full", value: "full"}, {text:"if on sale", value: "if on sale"}],
     newFood: {
       name: "",
-      stores: {},
+      stores: {0:0},
       essential: false,
       status: "buy",
       notes: "",
@@ -86,6 +87,13 @@ var app = new Vue({
     newStore: {
       name: "",
       foods: []
+    }
+  },
+  computed: {
+    filteredfoods: function () {
+      return this.foods.filter(function (food) {
+        return food.stores.indexOf(app.focusStoreId) > -1;
+      })
     }
   },
 
@@ -133,10 +141,10 @@ var app = new Vue({
       Foods.child(food.id).update({"status":food.status});
     },
     properties: function (food) {
-      app.focusFood = food;
+      // app.focusFood = food;
       
       // $('#propModal').html(modalhtml);
-      $('#propModal').modal({"show":true});
+      $("#"+food.id+'_propertiesModal').modal({"show":true});
     },
 
     storeModal: function () {      
@@ -157,8 +165,10 @@ var app = new Vue({
     updateStore: function (food, store) {
       // var path = "store/"+store.id;
       // var update = {path:food.store[store]};
-        Stores.child(store.id+"/foods/"+food.id).set(true);
-          Foods.child(food.id+"/stores/"+store.id).set(true);
+       // stores.foods[food.id] = food.stores[store.id];
+        // Stores.child(store.id+"/foods/"+food.id).set(food.stores[store.id]);
+        Foods.child(food.id+"/stores/").set(food.stores);
+
     },
     goShopping: function () {
         $(".pantry").hide();
@@ -197,6 +207,22 @@ var app = new Vue({
         $(".shop").hide();
       $(".full").show(); //food status
       $(".sale-bubble").remove();
+      app.focusStoreId = 0;
+      app.focusStoreName = "--"
+    },
+    changeStore: function () {
+      if (app.focusStoreName == '--') {
+        app.focusStoreId = 0;
+      }
+      else{
+        for (var i = 0; i < app.stores.length; i++) {
+          if (app.stores[i].name == app.focusStoreName) {
+            app.focusStoreId = app.stores[i].id;
+          }
+        }
+      }
+
+      app.goShopping();
     }
 
   }
