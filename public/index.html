@@ -137,10 +137,10 @@
       <td></td>
     </tr>
 
-    <tr id="{{food.id}}_row" v-for="food in filteredfoods" class="food {{food.status}}"  transition>
+    <tr id="{{food.id}}_row" v-for="food in filteredfoods  | orderBy 'name'" class="food {{food.status}}"  transition>
     <td class="shop"> <input type="checkbox" v-model="food.purchased" v-on:change="purchase(food)"> </td>
     <td class="pantry"> 
-    <select v-model="food.status" class="form-control" v-on:change="updateStatus(food)">
+    <select v-model="food.status" class="form-control status" v-on:change="updateStatus(food)">
   <!-- <template v-for="option in options"> -->
     <option v-for="option in options" v-bind:value="option" v-bind:selected="option == food.status">{{option}}</option>
   <!-- </template> -->

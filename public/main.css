@@ -343,3 +343,9 @@ ul {
 .errors {
   color: #f00;
 }
+
+/* My styles*/
+
+.status {
+    width: 60px;
+}
